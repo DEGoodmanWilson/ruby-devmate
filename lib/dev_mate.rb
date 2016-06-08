@@ -35,18 +35,19 @@ module DevMate
       response = self.post('/customers/', options)
 
       #TODO handle timeouts!
+      response_object = JSON.parse response.body
 
       unless response.code == 201
         #sad path
-        error = JSON.parse response.body
+        errors = response_object["errors"]
 
         case response.code
           when 400
-            raise BadRequestError, "#{error.title} #{error.detail}"
+            raise BadRequestError, "#{errors[0]["title"]} #{errors[0]["detail"]}"
           when 401
-            raise UnauthorizedError, error.title
+            raise UnauthorizedError, errors[0]["title"]
           when 409
-            raise ConflictError, "#{error.title} #{error.detail}"
+            raise ConflictError, "#{errors[0]["title"]} #{errors[0]["detail"]}"
         end
       end
 
