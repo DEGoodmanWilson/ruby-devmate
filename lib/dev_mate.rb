@@ -19,7 +19,7 @@ module DevMate
 
     def self.SetToken(token)
       @@token = token
-      @@auth_header = "Token #{token}fdsfdssdfds"
+      @@auth_header = "Token #{token}"
     end
 
     def self.Token
@@ -31,7 +31,9 @@ module DevMate
       data[last_name] = last_name if last_name
       data[first_name] = first_name if first_name
       data[note] = note if note
-      options = { :body => {:data => data}, :headers => {"Authorization" => @@auth_header }}
+      body = {:data => data}
+
+      options = { :body => body.to_json, :headers => {"Authorization" => @@auth_header }}
       response = self.post('/customers/', options)
 
       #TODO handle timeouts!
