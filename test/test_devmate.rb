@@ -28,3 +28,25 @@ describe "When creating a user" do
     proc { DevMate::DevMate.CreateCustomer("foo@example.com") }.must_raise DevMate::UnauthorizedError
   end
 end
+
+describe "When looking up a customer" do
+  it "should succeed when we use a valid email address" do
+    customer_list = DevMate::DevMate.FindCustomer(email: "foo@example.com")
+    customer_list[0]["email"].must_equal "foo@example.com"
+  end
+
+  it "should succeed when we use a valid customer id" do
+    dummy_customer_list = DevMate::DevMate.FindCustomer(email: "foo@example.com")
+    customer_list = DevMate::DevMate.FindCustomer(id: dummy_customer_list[0]["id"])
+    customer_list[0]["id"].must_equal dummy_customer_list[0]["id"]
+  end
+
+  it "should fail when invalid authorization is provided" do
+    DevMate::DevMate.SetToken("foobar")
+    proc { DevMate::DevMate.FindCustomer("foo@example.com") }.must_raise DevMate::UnauthorizedError
+  end
+
+  it "should fail when the user doesn't exist" do
+    proc { DevMate::DevMate.FindCustomer("foo2@example.com") }.must_raise DevMate::NotFoundError
+  end
+end
