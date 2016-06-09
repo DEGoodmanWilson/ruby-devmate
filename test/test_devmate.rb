@@ -39,7 +39,7 @@ describe "When looking up a customer" do
     email = "#{SecureRandom.uuid}@example.com"
     customer = DevMate::DevMate.CreateCustomer(email)
 
-    customer_list = DevMate::DevMate.FindCustomer(email: email)
+    customer_list = DevMate::DevMate.FindCustomerWithFilters(email: email)
     customer_list[0]["email"].must_equal customer["email"]
   end
 
@@ -48,8 +48,9 @@ describe "When looking up a customer" do
     customer = DevMate::DevMate.CreateCustomer(email)
 
     found_customer = DevMate::DevMate.FindCustomerById(customer["id"])
+
     found_customer.wont_be_nil
-s    found_customer["id"].must_equal customer["id"]
+    found_customer["id"].must_equal customer["id"]
   end
 
   it "should fail when invalid authorization is provided" do
@@ -59,6 +60,7 @@ s    found_customer["id"].must_equal customer["id"]
   end
 
   it "should fail when the user doesn't exist" do
-    DevMate::DevMate.FindCustomerById(-1).must_be_empty
+    #this is just a guess at a user id that is too big to exist. This is contingent and not the right thing to do
+    DevMate::DevMate.FindCustomerById(1000000000000).must_be_nil
   end
 end

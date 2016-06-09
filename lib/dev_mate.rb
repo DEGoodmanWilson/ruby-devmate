@@ -60,7 +60,8 @@ module DevMate
     end
 
     # return response.body on success
-    return JSON.parse response.body
+    response_object = JSON.parse response.body
+    return response_object['data']
     end
 
     def self.FindCustomerById(id) response = self.get("/customers/#{id}", :headers => { "Authorization" => @@auth_header })
@@ -86,8 +87,6 @@ module DevMate
     end
 
     def self.FindCustomerWithFilters(email: nil, first_name: nil, last_name: nil, license_key: nil, identifier: nil, order_id: nil, activation_id: nil, invoice: nil, offset: nil, limit: nil, with: nil)
-
-      return [] if (email.nil? && first_name.nil? && last_name.nil? && license_key.nil? && identifier.nil? && order_id.nil? && activation_id.nil? && invoice.nil? && offset.nil? && limit.nil? && with.nil?)
 
       query = {}
       query["filter[email]"] = email if email
