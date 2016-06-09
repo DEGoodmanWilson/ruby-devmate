@@ -49,6 +49,6 @@ describe "When looking up a customer" do
   end
 
   it "should fail when the user doesn't exist" do
-    proc { DevMate::DevMate.FindCustomer(email: "foo2@example.com") }.must_raise DevMate::NotFoundError
+    DevMate::DevMate.FindCustomer(email: "foo2@example.com").must_be_empty
   end
 end

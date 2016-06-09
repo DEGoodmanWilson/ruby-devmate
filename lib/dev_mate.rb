@@ -84,8 +84,6 @@ module DevMate
       options = {:query => query, :headers => {"Authorization" => @@auth_header}}
       response = self.get("/customers#{path}", :query => query, :headers => {"Authorization" => @@auth_header})
 
-      puts response.inspect
-
       #TODO handle timeouts!
       response_object = JSON.parse response.body
 
@@ -97,7 +95,7 @@ module DevMate
           when 401
             raise UnauthorizedError, errors[0]["title"]
           when 404
-            raise NotFoundError, "#{errors[0]["title"]} #{errors[0]["detail"]}"
+            return []
         end
       end
 
