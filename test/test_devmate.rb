@@ -26,6 +26,7 @@ describe "When creating a user" do
   it "should fail when the an invalid token is provided" do
     DevMate::DevMate.SetToken("foobar")
     proc { DevMate::DevMate.CreateCustomer("foo@example.com") }.must_raise DevMate::UnauthorizedError
+    DevMate::DevMate.SetToken(ENV["DEVMATE_TOKEN"])
   end
 end
 
@@ -43,10 +44,11 @@ describe "When looking up a customer" do
 
   it "should fail when invalid authorization is provided" do
     DevMate::DevMate.SetToken("foobar")
-    proc { DevMate::DevMate.FindCustomer("foo@example.com") }.must_raise DevMate::UnauthorizedError
+    proc { DevMate::DevMate.FindCustomer(email: "foo@example.com") }.must_raise DevMate::UnauthorizedError
+    DevMate::DevMate.SetToken(ENV["DEVMATE_TOKEN"])
   end
 
   it "should fail when the user doesn't exist" do
-    proc { DevMate::DevMate.FindCustomer("foo2@example.com") }.must_raise DevMate::NotFoundError
+    proc { DevMate::DevMate.FindCustomer(email: "foo2@example.com") }.must_raise DevMate::NotFoundError
   end
 end
