@@ -40,6 +40,8 @@ module DevMate
       data[note] = note if note
       body = { :data => data }
 
+      raise UnauthorizedError, "Please specify a token with SetToken()" unless defined? @@token
+
       options = { :body => body.to_json, :headers => { "Authorization" => @@auth_header } }
       response = self.post('/customers/', options)
 
@@ -68,6 +70,8 @@ module DevMate
     end
 
     def self.FindCustomerById(id)
+
+      raise UnauthorizedError, "Please specify a token with SetToken()" unless defined? @@token
 
       response = self.get("/customers/#{id}", :headers => { "Authorization" => @@auth_header })
 
@@ -106,6 +110,8 @@ module DevMate
       query["limit"] = limit if limit
       query["with"] = with if with
 
+      raise UnauthorizedError, "Please specify a token with SetToken()" unless defined? @@token
+
       response = self.get("/customers", :query => query, :headers => { "Authorization" => @@auth_header })
 
       #TODO handle timeouts!
@@ -142,6 +148,8 @@ module DevMate
 
       data = { :data => new_customer }
 
+      raise UnauthorizedError, "Please specify a token with SetToken()" unless defined? @@token
+
       response = self.put("/customers/#{id}", :body => data.to_json, :headers => { "Authorization" => @@auth_header })
 
       #TODO handle timeouts!
@@ -171,6 +179,9 @@ module DevMate
     def self.CreateLicense(customer, licenseId)
       id = customer["id"]
       data = { :data => { :license_type_id => licenseId } }
+
+      raise UnauthorizedError, "Please specify a token with SetToken()" unless defined? @@token
+
       response = self.post("/customers/#{id}/licenses", :body => data.to_json, :headers => { "Authorization" => @@auth_header })
 
       #TODO handle timeouts!
