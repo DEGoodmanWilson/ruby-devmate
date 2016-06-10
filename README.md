@@ -1,6 +1,7 @@
 # dev_mate
 [![Build Status](https://travis-ci.org/DEGoodmanWilson/ruby-devmate.svg?branch=master)](https://travis-ci.org/DEGoodmanWilson/ruby-devmate)
 [![Coverage Status](https://coveralls.io/repos/github/DEGoodmanWilson/ruby-devmate/badge.svg?branch=master)](https://coveralls.io/github/DEGoodmanWilson/ruby-devmate?branch=master)
+[![Gem Version](https://badge.fury.io/rb/dev_mate.svg)](https://badge.fury.io/rb/dev_mate)
 
 You use [DevMate](http://devmate.com) for selling your OS X apps, and your back-end is written in Ruby. This is the gem for you :D
 
