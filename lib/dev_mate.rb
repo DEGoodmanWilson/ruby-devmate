@@ -24,8 +24,9 @@ module DevMate
 
     base_uri 'https://public-api.devmate.com/v2'
 
-    def self.SetToken(token) @@token = token
-    @@auth_header = "Token #{token}"
+    def self.SetToken(token)
+      @@token = token
+      @@auth_header = "Token #{token}"
     end
 
     def self.Token
@@ -50,13 +51,14 @@ module DevMate
         errors = response_object["errors"]
 
         case response.code
-        when 400
-          raise BadRequestError, "#{errors[0]["title"]} #{errors[0]["detail"]}"
-        when 401
-          raise UnauthorizedError, errors[0]["title"]
-        when 409
-          raise ConflictError, "#{errors[0]["title"]} #{errors[0]["detail"]}"
-        else raise UnknownError
+          when 400
+            raise BadRequestError, "#{errors[0]["title"]} #{errors[0]["detail"]}"
+          when 401
+            raise UnauthorizedError, errors[0]["title"]
+          when 409
+            raise ConflictError, "#{errors[0]["title"]} #{errors[0]["detail"]}"
+          else
+            raise UnknownError
         end
       end
 
@@ -77,10 +79,10 @@ module DevMate
         errors = response_object["errors"]
 
         case response.code
-        when 401
-          raise UnauthorizedError, errors[0]["title"]
-        when 404
-          return nil
+          when 401
+            raise UnauthorizedError, errors[0]["title"]
+          when 404
+            return nil
         end
       end
 
@@ -114,10 +116,10 @@ module DevMate
         errors = response_object["errors"]
 
         case response.code
-        when 401
-          raise UnauthorizedError, errors[0]["title"]
-        when 404
-          return []
+          when 401
+            raise UnauthorizedError, errors[0]["title"]
+          when 404
+            return []
         end
       end
 
@@ -125,64 +127,66 @@ module DevMate
       response_object = JSON.parse response.body
       return response_object['data']
     end
-  end
 
-  def self.UpdateCustomer(customer)
+    def self.UpdateCustomer(customer)
 
-    return nil unless customer['id']
+      return nil unless customer['id']
 
-    id = customer['id']
+      id = customer['id']
 
-    new_customer = {}
-    new_customer[:email] = customer[email] if customer[email]
-    new_customer[:first_name] = customer[first_name] if customer[first_name]
-    new_customer[:last_name] = customer[last_name] if customer[last_name]
-    new_customer[:notes] = customer[notes] if customer[notes]
+      new_customer = {}
+      new_customer[:email] = customer["email"] if customer["email"]
+      new_customer[:first_name] = customer["first_name"] if customer["first_name"]
+      new_customer[:last_name] = customer["last_name"] if customer["last_name"]
+      new_customer[:notes] = customer["notes"] if customer["notes"]
 
-    data = {:data => new_customer}
+      data = { :data => new_customer }
 
-    response = self.put("/customers/#{id}", :body => data.to_json, :headers => { "Authorization" => @@auth_header })
+      response = self.put("/customers/#{id}", :body => data.to_json, :headers => { "Authorization" => @@auth_header })
 
-    #TODO handle timeouts!
-    response_object = JSON.parse response.body
+      #TODO handle timeouts!
+      response_object = JSON.parse response.body
 
-    unless response.code == 201
-      #sad path
-      errors = response_object["errors"]
+      unless response.code == 201
+        #sad path
+        errors = response_object["errors"]
 
-      case response.code
-      when 400
-        raise BadRequestError, "#{errors[0]["title"]} #{errors[0]["detail"]}"
-      when 401
-        raise UnauthorizedError, errors[0]["title"]
-      when 404
-        raise NotFoundError, "#{errors[0]["title"]} #{errors[0]["detail"]}"
-      when 409
-        raise ConflictError, "#{errors[0]["title"]} #{errors[0]["detail"]}"
+        case response.code
+          when 400
+            raise BadRequestError, "#{errors[0]["title"]} #{errors[0]["detail"]}"
+          when 401
+            raise UnauthorizedError, errors[0]["title"]
+          when 404
+            raise NotFoundError, "#{errors[0]["title"]} #{errors[0]["detail"]}"
+          when 409
+            raise ConflictError, "#{errors[0]["title"]} #{errors[0]["detail"]}"
+        end
       end
+
+      # return response.body on success
+      response_object = JSON.parse response.body
+      return response_object['data']
     end
 
-    # return response.body on success
-    response_object = JSON.parse response.body
-    return response_object['data']
-  end
+    def self.CreateLicense(customer, licenseId)
+      id = customer["id"]
+      data = { :data => { :license_type_id => licenseId } }
+      response = self.post("/customers/#{id}/licenses", :body => data.to_json, :headers => { "Authorization" => @@auth_header })
 
-  def self.CreateLicense(customer, licenseId)
-    data = { :data => { :license_type_id => licenseId } }
-    response = self.post("/customers/#{id}/licenses", :body => data.to_json, :headers => { "Authorization" => @@auth_header })
+      unless response.code == 201
+        #sad path
+        errors = response_object["errors"]
 
-    unless response.code == 201
-      #sad path
-      errors = response_object["errors"]
-
-      case response.code
-      when 400
-        raise BadRequestError, "#{errors[0]["title"]} #{errors[0]["detail"]}"
+        case response.code
+          when 400
+            raise BadRequestError, "#{errors[0]["title"]} #{errors[0]["detail"]}"
+        end
       end
+
+      # return response.body on success
+      response_object = JSON.parse response.body
+      return response_object['data']
     end
 
-    # return response.body on success
-    response_object = JSON.parse response.body
-    return response_object['data']
-  end
-end
+  end # class
+end # module

@@ -68,3 +68,18 @@ describe "When looking up a customer" do
     DevMate::DevMate.FindCustomerById(1000000000000).must_be_nil
   end
 end
+
+describe "When updating a customer" do
+  it "should succeed when the stars align" do
+    email = "#{SecureRandom.uuid}@example.com"
+    customer = DevMate::DevMate.CreateCustomer(email)
+    customer["last_name"].must_be_empty
+
+    customer["last_name"] = "Foobar"
+    updated_customer = DevMate::DevMate.UpdateCustomer(customer)
+    updated_customer["last_name"].must_equal customer["last_name"]
+
+    fetched_customer = DevMate::DevMate.FindCustomerById(customer["id"])
+    fetched_customer["last_name"].must_equal customer["last_name"]
+  end
+end
