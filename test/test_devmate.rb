@@ -82,4 +82,26 @@ describe "When updating a customer" do
     fetched_customer = DevMate::DevMate.FindCustomerById(customer["id"])
     fetched_customer["last_name"].must_equal customer["last_name"]
   end
+
+  it "should fail with an invalid auth" do
+    email = "#{SecureRandom.uuid}@example.com"
+    customer = DevMate::DevMate.CreateCustomer(email)
+    customer["last_name"] = "Foobar"
+
+    DevMate::DevMate.SetToken("foobar")
+    proc { DevMate::DevMate.UpdateCustomer(customer) }.must_raise DevMate::UnauthorizedError
+    DevMate::DevMate.SetToken(ENV["DEVMATE_TOKEN"])
+  end
+
+  it "should fail if an email was not specified" do
+    email = "#{SecureRandom.uuid}@example.com"
+    customer = DevMate::DevMate.CreateCustomer(email)
+    customer.delete("email")
+    proc { DevMate::DevMate.UpdateCustomer(customer) }.must_raise DevMate::BadRequestError
+  end
+
+  it "should fail when the id is invalid" do
+    customer = { "id" => 1000000000000, "email" => "foobar@example.com", "last_name" => "Foobar"}
+    proc { DevMate::DevMate.UpdateCustomer(customer) }.must_raise DevMate::NotFoundError
+  end
 end
