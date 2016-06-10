@@ -32,58 +32,61 @@ module DevMate
       @@token
     end
 
-    def self.CreateCustomer(email, last_name: nil, first_name: nil, note: nil) data = { :email => email }
-    data[last_name] = last_name if last_name
-    data[first_name] = first_name if first_name
-    data[note] = note if note
-    body = { :data => data }
+    def self.CreateCustomer(email, last_name: nil, first_name: nil, note: nil)
+      data = { :email => email }
+      data[last_name] = last_name if last_name
+      data[first_name] = first_name if first_name
+      data[note] = note if note
+      body = { :data => data }
 
-    options = { :body => body.to_json, :headers => { "Authorization" => @@auth_header } }
-    response = self.post('/customers/', options)
+      options = { :body => body.to_json, :headers => { "Authorization" => @@auth_header } }
+      response = self.post('/customers/', options)
 
-    #TODO handle timeouts!
-    response_object = JSON.parse response.body
+      #TODO handle timeouts!
+      response_object = JSON.parse response.body
 
-    unless response.code == 201
-      #sad path
-      errors = response_object["errors"]
+      unless response.code == 201
+        #sad path
+        errors = response_object["errors"]
 
-      case response.code
-      when 400
-        raise BadRequestError, "#{errors[0]["title"]} #{errors[0]["detail"]}"
-      when 401
-        raise UnauthorizedError, errors[0]["title"]
-      when 409
-        raise ConflictError, "#{errors[0]["title"]} #{errors[0]["detail"]}"
-      else raise UnknownError
+        case response.code
+        when 400
+          raise BadRequestError, "#{errors[0]["title"]} #{errors[0]["detail"]}"
+        when 401
+          raise UnauthorizedError, errors[0]["title"]
+        when 409
+          raise ConflictError, "#{errors[0]["title"]} #{errors[0]["detail"]}"
+        else raise UnknownError
+        end
       end
+
+      # return response.body on success
+      response_object = JSON.parse response.body
+      return response_object['data']
     end
 
-    # return response.body on success
-    response_object = JSON.parse response.body
-    return response_object['data']
-    end
+    def self.FindCustomerById(id)
 
-    def self.FindCustomerById(id) response = self.get("/customers/#{id}", :headers => { "Authorization" => @@auth_header })
+      response = self.get("/customers/#{id}", :headers => { "Authorization" => @@auth_header })
 
-    #TODO handle timeouts!
-    response_object = JSON.parse response.body
+      #TODO handle timeouts!
+      response_object = JSON.parse response.body
 
-    unless response.code == 201
-      #sad path
-      errors = response_object["errors"]
+      unless response.code == 201
+        #sad path
+        errors = response_object["errors"]
 
-      case response.code
-      when 401
-        raise UnauthorizedError, errors[0]["title"]
-      when 404
-        return nil
+        case response.code
+        when 401
+          raise UnauthorizedError, errors[0]["title"]
+        when 404
+          return nil
+        end
       end
-    end
 
-    # return response.body on success
-    response_object = JSON.parse response.body
-    return response_object['data']
+      # return response.body on success
+      response_object = JSON.parse response.body
+      return response_object['data']
     end
 
     def self.FindCustomerWithFilters(email: nil, first_name: nil, last_name: nil, license_key: nil, identifier: nil, order_id: nil, activation_id: nil, invoice: nil, offset: nil, limit: nil, with: nil)
@@ -123,4 +126,3 @@ module DevMate
       return response_object['data']
     end
   end
-end
