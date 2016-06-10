@@ -2,6 +2,9 @@ gem "minitest"
 require 'minitest/autorun'
 require 'dev_mate'
 require 'securerandom'
+require 'coveralls'
+
+Coveralls.wear!
 
 DevMate::DevMate.SetToken(ENV["DEVMATE_TOKEN"])
 
