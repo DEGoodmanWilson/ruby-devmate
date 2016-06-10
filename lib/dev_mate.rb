@@ -173,6 +173,9 @@ module DevMate
       data = { :data => { :license_type_id => licenseId } }
       response = self.post("/customers/#{id}/licenses", :body => data.to_json, :headers => { "Authorization" => @@auth_header })
 
+      #TODO handle timeouts!
+      response_object = JSON.parse response.body
+
       unless response.code == 201
         #sad path
         errors = response_object["errors"]

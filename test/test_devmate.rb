@@ -105,3 +105,12 @@ describe "When updating a customer" do
     proc { DevMate::DevMate.UpdateCustomer(customer) }.must_raise DevMate::NotFoundError
   end
 end
+
+describe "When creating a license" do
+  it "should succeed when the stars align" do
+    email = "#{SecureRandom.uuid}@example.com"
+    customer = DevMate::DevMate.CreateCustomer(email)
+    license = DevMate::DevMate.CreateLicense(customer, 1)
+    license["activation_key"].wont_be_empty
+  end
+end
