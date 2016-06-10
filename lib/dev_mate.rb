@@ -166,4 +166,23 @@ module DevMate
     response_object = JSON.parse response.body
     return response_object['data']
   end
+
+  def self.CreateLicense(customer, licenseId)
+    data = { :data => { :license_type_id => licenseId } }
+    response = self.post("/customers/#{id}/licenses", :body => data.to_json, :headers => { "Authorization" => @@auth_header })
+
+    unless response.code == 201
+      #sad path
+      errors = response_object["errors"]
+
+      case response.code
+      when 400
+        raise BadRequestError, "#{errors[0]["title"]} #{errors[0]["detail"]}"
+      end
+    end
+
+    # return response.body on success
+    response_object = JSON.parse response.body
+    return response_object['data']
+  end
 end
