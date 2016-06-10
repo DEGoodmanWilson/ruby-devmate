@@ -183,6 +183,8 @@ module DevMate
         case response.code
           when 400
             raise BadRequestError, "#{errors[0]["title"]} #{errors[0]["detail"]}"
+          when 401
+            raise UnauthorizedError, errors[0]["title"]
         end
       end
 

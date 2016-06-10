@@ -104,6 +104,18 @@ describe "When updating a customer" do
     customer = { "id" => 1000000000000, "email" => "foobar@example.com", "last_name" => "Foobar"}
     proc { DevMate::DevMate.UpdateCustomer(customer) }.must_raise DevMate::NotFoundError
   end
+
+  it "should fail if an email was not specified" do
+    email_1 = "#{SecureRandom.uuid}@example.com"
+    customer_1 = DevMate::DevMate.CreateCustomer(email_1)
+
+    email_2 = "#{SecureRandom.uuid}@example.com"
+    customer_2 = DevMate::DevMate.CreateCustomer(email_2)
+
+    customer_2["email"] = email_1
+    proc { DevMate::DevMate.UpdateCustomer(customer_2) }.must_raise DevMate::ConflictError
+  end
+
 end
 
 describe "When creating a license" do
@@ -112,5 +124,28 @@ describe "When creating a license" do
     customer = DevMate::DevMate.CreateCustomer(email)
     license = DevMate::DevMate.CreateLicense(customer, 1)
     license["activation_key"].wont_be_empty
+  end
+
+  it "should fail with an invalid auth" do
+    email = "#{SecureRandom.uuid}@example.com"
+    customer = DevMate::DevMate.CreateCustomer(email)
+
+    DevMate::DevMate.SetToken("foobar")
+    proc { DevMate::DevMate.CreateLicense(customer, 1) }.must_raise DevMate::UnauthorizedError
+    DevMate::DevMate.SetToken(ENV["DEVMATE_TOKEN"])
+  end
+
+  it "should fail with an invalid license id" do
+    email = "#{SecureRandom.uuid}@example.com"
+    customer = DevMate::DevMate.CreateCustomer(email)
+
+    proc { DevMate::DevMate.CreateLicense(customer, 100) }.must_raise DevMate::BadRequestError
+  end
+
+
+  it "should fail with an invalid customer id" do
+    customer = { "id" => 1000000000000, "email" => "foobar@example.com", "last_name" => "Foobar"}
+
+    proc { DevMate::DevMate.CreateLicense(customer, 1) }.must_raise DevMate::BadRequestError
   end
 end
